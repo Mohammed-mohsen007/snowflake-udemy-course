@@ -51,34 +51,17 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install snowflake-snowpark-python requests pytz
 
-      # Step 5: Run AQI ingestion
-      # - name: Run AQI ingestion
-      #   run: |
-      #     python ./e2e-project-udemy/04-snowpark-python/ingest-api-data.py
+      # Step 5: Find AQI Python Script
+      - name: Find AQI Python Script
+        run: |
+          echo "Current directory:"
+          pwd
 
-      - name: Find and run AQI ingestion script
-  env:
-    DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
-    SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-    SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-    SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
-  run: |
-    echo "Current working directory:"
-    pwd
+          echo "Repository folders:"
+          ls -la
 
-    echo "All Python files:"
-    find . -type f -name "*.py"
+          echo "All Python files:"
+          find . -type f -name "*.py"
 
-    echo "Searching for ingestion script..."
-
-    FILE_PATH=$(find . -type f -name "ingest-api-data.py" | head -n 1)
-
-    if [ -z "$FILE_PATH" ]; then
-      echo "ERROR: ingest-api-data.py not found!"
-      echo "Please check whether the file is committed to GitHub."
-      exit 1
-    fi
-
-    echo "Found file: $FILE_PATH"
-
-    python "$FILE_PATH"
+          echo "Searching for ingestion script:"
+          find . -type f -iname "*ingest*"
