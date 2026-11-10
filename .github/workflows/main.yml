@@ -1,0 +1,37 @@
+name: india_air_quality_json
+
+# Controls when the workflow will run-name
+on:
+  #Triggers the workflow on push or pull request events but only for the main branch
+  workflow_dispatch:
+# on:
+  # schedule:
+    # - cron: '45 * * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_REGION: ${{ secrets.SNOWFLAKE_REGION }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE || 'SYSADMIN' }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE || 'dev_db' }}
+      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA || 'stage_sch' }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE || 'load_wh' }}
+      SNOWFLAKE_STAGE: ${{ secrets.SNOWFLAKE_STAGE }}
+      AQI_LIMIT: ${{ secrets.AQI_LIMIT || '4000' }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "snowflake-snowpark-python[pandas]"
+
+      - name: Run AQI ingestion
+        run: python ./e2e-project-udemy/04-snowpark-python/ingest-api-data.py
