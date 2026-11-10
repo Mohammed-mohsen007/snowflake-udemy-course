@@ -1,12 +1,8 @@
 name: india_air_quality_json
 
-# Controls when the workflow will run-name
+# Run workflow manually
 on:
-  #Triggers the workflow on push or pull request events but only for the main branch
   workflow_dispatch:
-# on:
-  # schedule:
-    # - cron: '45 * * * *'
 
 jobs:
   build:
@@ -26,12 +22,36 @@ jobs:
       AQI_LIMIT: ${{ secrets.AQI_LIMIT || '4000' }}
 
     steps:
-      - uses: actions/checkout@v3
 
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Find Python file
+      - name: Check repository files
+        run: |
+          echo "Current directory:"
+          pwd
+
+          echo "Repository structure:"
+          ls -la
+
+          echo "Find Python files:"
+          find . -type f -name "ingest-api-data.py"
+
+      # Step 3: Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Step 4: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "snowflake-snowpark-python[pandas]"
+          python -m pip install snowflake-snowpark-python requests pytz
 
+      # Step 5: Run AQI ingestion
       - name: Run AQI ingestion
-        run: python ./e2e-project-udemy/04-snowpark-python/ingest-api-data.py
+        run: |
+          python ./e2e-project-udemy/04-snowpark-python/ingest-api-data.py
